@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meesho Seller | Product Verification</title>
+    <style>
+        :root {
+            /* Meesho-inspired color scheme */
+            --primary-color: #9f2089; /* Meesho Purple */
+            --secondary-color: #fdf2f8; /* Pink 50 */
+            --text-color: #333333;
+            --border-color: #e5e7eb;
+            --background-color: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-header {
+            background-color: #ffffff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color); /* <-- UPDATED: Changed color to purple */
+        }
+        
+        .nav-links a {
+            margin-left: 1.5rem;
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .main-title {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #111827;
+        }
+
+        .tool-container {
+            display: flex;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .left-panel, .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-area {
+            background-color: var(--secondary-color);
+            border: 2px dashed var(--primary-color);
+            border-radius: 0.5rem;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-area:hover {
+            background-color: #fce7f3;
+        }
+
+        .upload-area h3 {
+            margin: 0 0 0.25rem 0;
+            color: var(--primary-color);
+            font-size: 1.125rem;
+        }
+
+        .upload-area p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .preview-area {
+            flex-grow: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background-color: #f9fafb;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-placeholder {
+            color: #9ca3af;
+        }
+
+        .preview-area img, .preview-area video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+            display: none;
+        }
+        
+        .right-panel h2 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .report-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .report-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .results-content, .next-steps-box {
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            min-height: 100px;
+            line-height: 1.6;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .analyze-button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-top: auto; /* Pushes button to the bottom */
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .analyze-button:hover:not(:disabled) {
+            background-color: #861973;
+        }
+        
+        .analyze-button:disabled {
+            background-color: #e9d5ff;
+            cursor: not-allowed;
+        }
+        
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .file-input { display: none; }
+    </style>
+</head>
+<body>
+
+    <header class="page-header">
+        <div class="logo">meesho</div>
+        <nav class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Listings</a>
+            <a href="#">Help Center</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <h1 class="main-title">Product Verification Tool</h1>
+        
+        <div class="tool-container">
+            <div class="left-panel">
+                <input type="file" id="media-upload" class="file-input" accept="image/*,video/*">
+                <div class="upload-area" id="upload-area">
+                    <h3>Upload Product Media</h3>
+                    <p>Click or drag & drop to get an AI analysis</p>
+                </div>
+                <div class="preview-area">
+                    <p class="preview-placeholder" id="preview-placeholder">Your product media will appear here</p>
+                    <img id="image-preview" src="#" alt="Image Preview">
+                    <video id="video-preview" controls></video>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <h2>AI Verification Report</h2>
+                
+                <div class="report-section">
+                    <h3>AI Generated Review & Rating</h3>
+                    <div id="results" class="results-content">
+                        Your AI review will be generated here once you upload a product...
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>Next Steps</h3>
+                    <div class="next-steps-box">
+                        Based on the AI review, consider updating your product description to highlight the strengths mentioned. A high score suggests the product is ready to be listed.
+                    </div>
+                </div>
+                
+                <button id="analyze-button" class="analyze-button" disabled>Analyze</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- IMPORTANT: PASTE YOUR GEMINI API KEY HERE ---
+            const GEMINI_API_KEY = "AIzaSyBeDv7ZLeLPbOXMDofdFLPHQ1K_e6CdW-E"; // <-- PASTE YOUR KEY INSIDE THE QUOTES
+
+            // --- Element References ---
+            const mediaUpload = document.getElementById('media-upload');
+            const uploadArea = document.getElementById('upload-area');
+            const imagePreview = document.getElementById('image-preview');
+            const videoPreview = document.getElementById('video-preview');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+            const analyzeButton = document.getElementById('analyze-button');
+            const resultsDiv = document.getElementById('results');
+
+            // --- Hardcoded System Prompt ---
+            const SYSTEM_PROMPT = "Write a clear and concise 4 lines product review based on the product video and description provided. Focus on the most important points a typical buyer would mention to help others decide whether to buy, including the product design and features, key pros and cons(write this compulsory), performance, quality, ease of use, and value for money. Keep the tone natural and relatable, as if a real customer is sharing their honest opinion in an easy-to-read format. At the end, include a key pros and cons and brief final thoughts summary and an overall rating out of 5 stars. Avoid overly long or technical details, and highlight what stood out the most and give as humanly an review as possible and never talk about price";
+            
+            let currentMediaType = null;
+            let imageBase64 = null;
+
+            // --- File Handling & UI Logic ---
+            uploadArea.addEventListener('click', () => mediaUpload.click());
+            ['dragover', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, e => e.preventDefault());
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                if (e.dataTransfer.files.length) {
+                    mediaUpload.files = e.dataTransfer.files;
+                    mediaUpload.dispatchEvent(new Event('change'));
+                }
+            });
+
+            mediaUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Reset state
+                imagePreview.style.display = 'none';
+                videoPreview.style.display = 'none';
+                previewPlaceholder.style.display = 'block';
+                URL.revokeObjectURL(videoPreview.src);
+                analyzeButton.disabled = true;
+
+                if (file.type.startsWith('image/')) {
+                    currentMediaType = 'image';
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        imageBase64 = reader.result.split(',')[1];
+                        imagePreview.src = reader.result;
+                        imagePreview.style.display = 'block';
+                        previewPlaceholder.style.display = 'none';
+                        analyzeButton.disabled = false;
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type.startsWith('video/')) {
+                    currentMediaType = 'video';
+                    const url = URL.createObjectURL(file);
+                    videoPreview.src = url;
+                    videoPreview.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    analyzeButton.disabled = false;
+                } else {
+                    alert('Unsupported file type. Please upload an image or video.');
+                }
+            });
+
+            // --- Core Gemini API Logic ---
+            async function callGeminiAPI(prompt, base64Data) {
+                if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || !GEMINI_API_KEY) {
+                    alert('Please paste your Gemini API key into the script file.');
+                    return;
+                }
+
+                resultsDiv.innerHTML = '<div class="loader"></div>';
+                analyzeButton.disabled = true;
+
+                const model = 'gemini-1.5-flash-latest';
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+                const payload = {
+                    "contents": [{
+                        "parts": [
+                            { "text": prompt },
+                            {
+                                "inlineData": {
+                                    "mimeType": "image/jpeg",
+                                    "data": base64Data
+                                }
+                            }
+                        ]
+                    }]
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${response.status} - ${errorData.error.message}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (text) {
+                        resultsDiv.innerText = text;
+                    } else {
+                        resultsDiv.innerText = 'Analysis could not be generated. The response was empty.';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    resultsDiv.innerText = `An error occurred: ${error.message}`;
+                } finally {
+                    analyzeButton.disabled = false;
+                }
+            }
+
+            analyzeButton.addEventListener('click', () => {
+                if (currentMediaType === 'image' && imageBase64) {
+                    callGeminiAPI(SYSTEM_PROMPT, imageBase64);
+                } else if (currentMediaType === 'video') {
+                    captureVideoFrame().then(base64Data => {
+                        if (base64Data) {
+                            callGeminiAPI(SYSTEM_PROMPT, base64Data);
+                        }
+                    });
+                }
+            });
+            
+            function captureVideoFrame() {
+                return new Promise((resolve) => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = videoPreview.videoWidth;
+                    canvas.height = videoPreview.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg');
+                    resolve(dataUrl.split(',')[1]);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
